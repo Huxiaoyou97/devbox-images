@@ -1,0 +1,106 @@
+name: Sync Devbox Images
+
+on:
+  schedule:
+    # 每周一自动同步
+    - cron: '0 0 * * 1'
+  workflow_dispatch:  # 手动触发
+
+env:
+  TARGET_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          # 语言运行时
+          - go-1.22.5
+          - go-1.23.0
+          - node.js-18
+          - node.js-20
+          - node.js-22
+          - python-3.10
+          - python-3.11
+          - python-3.12
+          - php-7.4
+          - php-8.2
+          - java-openjdk17
+          - rust-1.81.0
+          - c-gcc-12.2.0
+          - cpp-gcc-12.2.0
+          - net-8.0
+          # 前端框架
+          - next.js-14.2.5
+          - nuxt3-v3.13
+          - vue-v3.4.29
+          - react-18.2.0
+          - angular-v18
+          - svelte-6.4.0
+          - astro-4.10.0
+          - umi-4.3.27
+          # Python 框架
+          - django-4.2.16
+          - flask-3.0.3
+          # Node.js 框架
+          - express.js-4.21.0
+          # Go 框架
+          - gin-v1.10.0
+          - chi-v5.1.0
+          - echo-v4.12.0
+          - iris-v12.2.11
+          # Java 框架
+          - spring-boot-3.3.2
+          - quarkus-3.16.1
+          - vert.x-4.5.10
+          # Rust 框架
+          - rocket-0.5.1
+          # 静态网站
+          - hugo-v0.135.0
+          - hexo-7.3.0
+          - docusaurus-3.5.2
+          - vitepress-1.4.0
+          # MCP
+          - mcp-python-3-12
+          - mcp-typescript-1-8
+          - mcp-csharp-1-0
+          - mcp-spring-boot-3-3-2
+          - mcp-mcp-proxy
+          # 操作系统/服务
+          - ubuntu-24.04
+          - debian-12.6
+          - nginx-1.22.1
+          # 其他
+          - sealaf-1.0.0
+
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull source image
+        run: |
+          docker pull ghcr.io/labring-actions/devbox-runtime/${{ matrix.image }}:latest
+
+      - name: Tag image
+        run: |
+          docker tag \
+            ghcr.io/labring-actions/devbox-runtime/${{ matrix.image }}:latest \
+            ${{ env.TARGET_REGISTRY }}/devbox-runtime/${{ matrix.image }}:latest
+
+      - name: Push image
+        run: |
+          docker push ${{ env.TARGET_REGISTRY }}/devbox-runtime/${{ matrix.image }}:latest
+
+      - name: Summary
+        run: |
+          echo "✅ Synced: ${{ matrix.image }}" >> $GITHUB_STEP_SUMMARY
