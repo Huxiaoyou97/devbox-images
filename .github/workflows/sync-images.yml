@@ -7,7 +7,7 @@ on:
   workflow_dispatch:  # 手动触发
 
 env:
-  TARGET_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  TARGET_REGISTRY: ghcr.io/huxiaoyou97
 
 jobs:
   sync:
