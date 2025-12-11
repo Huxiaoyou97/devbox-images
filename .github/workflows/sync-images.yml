@@ -89,17 +89,17 @@ jobs:
 
       - name: Pull source image
         run: |
-          docker pull ghcr.io/labring-actions/devbox-runtime/${{ matrix.image }}:latest
+          docker pull ghcr.io/labring-actions/devbox/${{ matrix.image }}:latest
 
       - name: Tag image
         run: |
           docker tag \
-            ghcr.io/labring-actions/devbox-runtime/${{ matrix.image }}:latest \
-            ${{ env.TARGET_REGISTRY }}/devbox-runtime/${{ matrix.image }}:latest
+            ghcr.io/labring-actions/devbox/${{ matrix.image }}:latest \
+            ${{ env.TARGET_REGISTRY }}/devbox/${{ matrix.image }}:latest
 
       - name: Push image
         run: |
-          docker push ${{ env.TARGET_REGISTRY }}/devbox-runtime/${{ matrix.image }}:latest
+          docker push ${{ env.TARGET_REGISTRY }}/devbox/${{ matrix.image }}:latest
 
       - name: Summary
         run: |
